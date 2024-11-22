@@ -1,0 +1,67 @@
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+   width: 6px;
+ }
+
+ *::-webkit-scrollbar-track {
+   background: #ffffff;
+ }
+
+ *::-webkit-scrollbar-thumb {
+   background-color: #e39cf7;
+   border-radius: 7px;
+   border: 3px  #ffffff;
+ }
+ .terms {
+  width: 60vw;
+  border-style: dotted;
+  height: 70vh;
+  position: relative;
+  left: 20vw;
+  background: transparent;
+  border: 1px solid rgb(166, 101, 226) ;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: scroll;
+  padding: 20px;
+}
+.term-con h1 {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+}
+.term-con h2 {
+  font-size: 1.4em;
+  margin-top: 20px;
+}
+.term-con p,
+.term-con li {
+  line-height: 1.6;}
+.term-con ul {
+  margin-left: 20px;
+}
+.con{
+   height: 10vh;
+   border: 1px solid rgb(166, 101, 226) ;
+   border-top: none;
+   width: 60vw;
+   text-align: center;
+   position: relative;
+   right: -20vw;
+   top: -1vh;
+}
+.con .accept{
+   position: relative;
+   top: 1vh;
+}
+.box button{
+   position: relative;
+   top: 2vh;
+   height: 4vh;
+   width: 4vw;
+   border-radius: 120px;
+}
+.box button:hover {
+   height: 4.5vh;
+   width: 4.5vw;
+}
