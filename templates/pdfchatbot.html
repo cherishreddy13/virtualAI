@@ -36,8 +36,9 @@
     <link rel="stylesheet" href="/static/css/screenmode.css" />
     <link rel="stylesheet" href="/static/css/chatbot.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/screenmode.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pdfchatbot.css') }}">
+
 </head>
 <body>
 
@@ -60,37 +61,96 @@
         </div>
       </div>
     </div>
-    <div class="chat-container">
-        <div class="messages" id="messages"></div>
-        <form id="chat-form">
-            <input type="text" id="user-input" placeholder="Type your message..." required />
-            <button type="submit">Send</button>
-        </form>
-    </div>
+    
+    
+<div class="container">
+  <h1>Chat with Your PDF</h1>
 
-  <script>
-      const form = document.getElementById('chat-form');
-      const input = document.getElementById('user-input');
-      const messages = document.getElementById('messages');
+  <!-- PDF Upload Section -->
+  <input type="file" id="pdfUpload" accept="application/pdf">
+  <button onclick="uploadPDF()">Upload PDF</button>
 
-        
-      form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const userMessage = input.value;
-          messages.innerHTML += `<div class="message user ">You: ${userMessage}</div>`;
-          input.value = '';
+  <div id="status"></div>
 
-          const response = await fetch('/ask', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({question: userMessage })
-          });
-          const data = await response.json();
-          const botMessage = data.answer || "Sorry, I couldn't process your request.";
-          messages.innerHTML += `<div class="message bot">Maya: ${botMessage}</div>`;
-          messages.scrollTop = messages.scrollHeight;
-      });
-  </script>
-  <script src="/static/js/script.js"></script>
+  <!-- Chat Section -->
+  <div class="chat-container">
+      <div id="chat-box"></div>
+      <input type="text" id="userInput" placeholder="Ask something about the PDF..." />
+      <button onclick="askQuestion()">Ask</button>
+  </div>
+</div>
+<script>
+let extractedText = "";
+
+// Function to upload PDF
+function uploadPDF() {
+const fileInput = document.getElementById("pdfUpload");
+const statusDiv = document.getElementById("status");
+
+if (fileInput.files.length === 0) {
+  alert("Please select a PDF file.");
+  return;
+}
+
+let formData = new FormData();
+formData.append("pdf", fileInput.files[0]);
+
+fetch("/upload-pdf", {  
+  method: "POST",
+  body: formData
+})
+.then(response => {
+  if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  return response.json();
+})
+.then(data => {
+  if (data.text) {
+      statusDiv.innerHTML = "✅ PDF uploaded successfully!";
+  } else {
+      statusDiv.innerHTML = "❌ Error: " + (data.error || "Uploading PDF failed.");
+  }
+})
+.catch(error => {
+  console.error("Error:", error);
+  statusDiv.innerHTML = "❌ Error uploading PDF.";
+});
+}
+
+
+
+// Function to ask a question
+function askQuestion() {
+const userInput = document.getElementById("userInput").value;
+const chatBox = document.getElementById("chat-box");
+
+if (!userInput.trim()) {
+    alert("Please enter a question.");
+    return;
+}
+
+chatBox.innerHTML += `<div class="user-message">You: ${userInput}</div>`;
+
+fetch("/pdf-ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: extractedText, question: userInput })
+})
+.then(response => response.json())
+.then(data => {
+    chatBox.innerHTML += `<div class="bot-message">Bot: ${data.answer}</div>`;
+})
+.catch(error => {
+    console.error("Error:", error);
+    chatBox.innerHTML += `<div class="bot-message">Bot: Sorry, something went wrong.</div>`;
+});
+
+document.getElementById("userInput").value = "";
+}
+
+</script>
+<script src="/static/js/script.js"></script>
+
 </body>
 </html>
